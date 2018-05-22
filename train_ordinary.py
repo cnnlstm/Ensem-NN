@@ -45,7 +45,7 @@ batch_size = 128
 epochs = 600
 verbose = 1
 shuffle = 1
-train_x_mean = 0.5909#14884877   #mean_value
+train_x_mean = 0.5909#14884877   #mean_value of train_cross_subject_data,while 0.5835 for train_cross_view_data
 max_len = 300
 
 feat_dim = 150
