@@ -1,2 +1,2 @@
 # Ensem-NN
-An ensemble neural network (Ensem-NN) for skeleton-based action recognition
+An ensemble one-dimensional convolutional neural network (Ensem-NN) for skeleton-based action recognition
