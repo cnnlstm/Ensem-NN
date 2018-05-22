@@ -35,7 +35,7 @@ lr = 0.01
 momentum = 0.9
 
 
-out_dir_name = 'ordinary_3'
+out_dir_name = 'ordinary'
 activation = "relu"
 optimizer = SGD(lr=lr, momentum=momentum, decay=0.0, nesterov=True)
 dropout = 0.0
@@ -45,7 +45,7 @@ batch_size = 128
 epochs = 600
 verbose = 1
 shuffle = 1
-train_x_mean = 0.5909#14884877
+train_x_mean = 0.5909#14884877   #mean_value
 max_len = 300
 
 feat_dim = 150
