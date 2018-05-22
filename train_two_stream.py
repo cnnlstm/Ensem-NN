@@ -33,8 +33,7 @@ loss = 'categorical_crossentropy'
 lr = 0.01
 momentum = 0.9   
 out_dir_name = "two_stream"                                                     
-optimizer = SGD(lr=0.01, momentum=0.9, decay=0.0, nesterov=True)           
-#optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)  
+optimizer = SGD(lr=0.01, momentum=0.9, decay=0.0, nesterov=True)             
 dropout = 0.0                                                                 
 reg = l1(1.e-4)                                                              
 ## AUGMENTATION PARAMS
@@ -76,7 +75,6 @@ len_test = len(test_lines)
 print "successfully,len(test_list)",len_test
 
 def read_h5(path):
-    #print path
     g = h5py.File(path)
     data = g['data']
     data = data[:]
@@ -154,87 +152,6 @@ def L1(x):
     out.append(x[i]/K.sum(K.abs(x[i])))
   out = tf.reshape(out,(batch_size,-1))
   return out
-'''
-def resnet_spa(
-           input,
-           n_classes, 
-           dropout=0.5,
-           kernel_regularizer=l1(1.e-4),
-           activation="relu"):
-
-  config = [ 
-             [(1,8,64)],
-             [(1,8,64)],
-             [(1,8,64)],
-             [(2,8,128)],
-             [(1,8,128)],
-             [(1,8,128)],
-             [(2,8,256)],
-             [(1,8,256)],
-             [(1,8,256)],
-           ]
-  initial_stride = 1
-  initial_filter_dim = 8
-  initial_num = 64
-  res_s = []
-  res_num = [2,5,8]
-  
-  #input = Input(shape=(max_len,feat_dim))
-  input = Permute((2,1))(input)
-  model = input
-
-  model = Conv1D(initial_num, 
-                 initial_filter_dim,
-                 strides=initial_stride,
-                 padding="same",
-                 kernel_initializer="he_normal",
-                 kernel_regularizer=kernel_regularizer)(model)
-
-  for depth in range(0,len(config)):
-    res_s.append(model)
-    for stride,filter_dim,num in config[depth]:
-      model = Conv1D(num, 
-                   filter_dim,
-                   strides=stride,
-                   padding="same",
-                   kernel_initializer="he_normal",
-                   kernel_regularizer=kernel_regularizer)(model)
-      model = BatchNormalization(axis=2)(model)
-      model = Activation(activation)(model)
-      model = Dropout(dropout)(model)
-
-      if depth in res_num:
-        print len(res_s)
-        #if depth == 2:
-        #res = res_s[-3]
-        #else:
-        res = res_s[-3]
-        res_shape = K.int_shape(res)
-        model_shape = K.int_shape(model)
-        if res_shape[2] != model_shape[2]:
-          res = Conv1D(num, 
-                       1,
-                       strides=2,
-                       padding="same",
-                       kernel_initializer="he_normal",
-                       kernel_regularizer=kernel_regularizer)(res)
-        model = add([res,model])
-
-
-  #bn = BatchNormalization(axis=2)(model)
-  #model = Activation(activation)(bn)
-
-  pool_window_shape = K.int_shape(model)
-  gap = AveragePooling1D(pool_window_shape[1],
-                           strides=1)(model)
-  flatten = Flatten()(gap)
-  dense = Dense(units=n_classes, 
-                activation="softmax",
-                kernel_initializer="he_normal")(flatten)
-  #model = Model(inputs=input, outputs=dense)
-  return dense
-'''
-
 
 def resnet_spa(
            input,
@@ -269,18 +186,10 @@ def resnet_spa(
                  padding="same",
                  kernel_initializer="he_normal",
                  kernel_regularizer=kernel_regularizer)(model)
-  # model = BatchNormalization(axis=2)(model)
-  # model = Activation(activation)(model)
-  # model = Dropout(dropout)(model)
-  
+
   for depth in range(0,len(config)):
     res_s.append(model)
     for stride,filter_dim,num in config[depth]:
-      
-      # bn = BatchNormalization(axis=2)(model)
-      # ac = Activation(activation)(bn)
-      # dr = Dropout(dropout)(ac)
-
       model = Conv1D(num, 
                    filter_dim,
                    strides=stride,
@@ -294,9 +203,7 @@ def resnet_spa(
       print model
       if depth in res_num:
         print len(res_s)
-        #if depth == 2:
-        #res = res_s[-3]
-        #else:
+
         res = res_s[-3]
         res_shape = K.int_shape(res)
         model_shape = K.int_shape(model)
@@ -322,7 +229,6 @@ def resnet_spa(
   dense = Dense(units=n_classes, 
                 activation="softmax",
                 kernel_initializer="he_normal")(flatten)
-  #model = Model(inputs=input, outputs=dense)
   return dense
 
 
@@ -360,18 +266,9 @@ def resnet_tem(input,
                  padding="same",
                  kernel_initializer="he_normal",
                  kernel_regularizer=kernel_regularizer)(model)
-  # model = BatchNormalization(axis=2)(model)
-  # model = Activation(activation)(model)
-  # model = Dropout(dropout)(model)
-  
   for depth in range(0,len(config)):
     res_s.append(model)
     for stride,filter_dim,num in config[depth]:
-      
-      # bn = BatchNormalization(axis=2)(model)
-      # ac = Activation(activation)(bn)
-      # dr = Dropout(dropout)(ac)
-
       model = Conv1D(num, 
                    filter_dim,
                    strides=stride,
@@ -385,9 +282,6 @@ def resnet_tem(input,
       print model
       if depth in res_num:
         print len(res_s)
-        #if depth == 2:
-        #res = res_s[-3]
-        #else:
         res = res_s[-3]
         res_shape = K.int_shape(res)
         model_shape = K.int_shape(model)
@@ -399,13 +293,10 @@ def resnet_tem(input,
                        kernel_initializer="he_normal",
                        kernel_regularizer=kernel_regularizer)(res)
         model = add([res,model])
-        #print model
 
 
   bn = BatchNormalization(axis=2)(model)
   model = Activation(activation)(bn)
-
-
   pool_window_shape = K.int_shape(model)
   gap = AveragePooling1D(pool_window_shape[1],
                            strides=1)(model)
@@ -413,7 +304,6 @@ def resnet_tem(input,
   dense = Dense(units=n_classes, 
                 activation="softmax",
                 kernel_initializer="he_normal")(flatten)
-  #model = Model(inputs=input, outputs=dense)
   return dense
 
 
