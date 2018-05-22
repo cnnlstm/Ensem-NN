@@ -40,7 +40,6 @@ momentum = 0.9
 out_dir_name = 'differ_drop_0.3'
 activation = "relu"
 optimizer = SGD(lr=lr, momentum=momentum, decay=0.0, nesterov=True)
-#optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 dropout = 0.3
 reg = l1(1.e-4)
 
@@ -48,12 +47,8 @@ batch_size = 128
 epochs = 10000
 verbose = 1
 shuffle = 1
-#train_x_mean = 0.5909#14884877
 max_len = 300
-
 feat_dim = 150
-
-
 n_classes = 60
 
 
@@ -190,18 +185,10 @@ def resnet(
                  padding="same",
                  kernel_initializer="he_normal",
                  kernel_regularizer=kernel_regularizer)(model)
-  # model = BatchNormalization(axis=2)(model)
-  # model = Activation(activation)(model)
-  # model = Dropout(dropout)(model)
   
   for depth in range(0,len(config)):
     res_s.append(model)
     for stride,filter_dim,num in config[depth]:
-      
-      # bn = BatchNormalization(axis=2)(model)
-      # ac = Activation(activation)(bn)
-      # dr = Dropout(dropout)(ac)
-
       model = Conv1D(num, 
                    filter_dim,
                    strides=stride,
@@ -215,9 +202,6 @@ def resnet(
       print model
       if depth in res_num:
         print len(res_s)
-        #if depth == 2:
-        #res = res_s[-3]
-        #else:
         res = res_s[-3]
         res_shape = K.int_shape(res)
         model_shape = K.int_shape(model)
@@ -229,12 +213,6 @@ def resnet(
                        kernel_initializer="he_normal",
                        kernel_regularizer=kernel_regularizer)(res)
         model = add([res,model])
-        #print model
-
-
-  #bn = BatchNormalization(axis=2)(model)
-  #model = Activation(activation)(bn)
-
 
   pool_window_shape = K.int_shape(model)
   gap = AveragePooling1D(pool_window_shape[1],
