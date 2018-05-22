@@ -35,12 +35,9 @@ np.random.seed(seed=1234)
 loss = 'categorical_crossentropy'
 lr = 0.01
 momentum = 0.9
-
-
 out_dir_name = 'attention'
 activation = "relu"
 optimizer = SGD(lr=lr, momentum=momentum, decay=0.0, nesterov=True)
-#optimizer = Adam(lr=lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 dropout = 0.1
 reg = l1(1.e-4)
 
@@ -48,7 +45,7 @@ batch_size = 128
 epochs = 600
 verbose = 1
 shuffle = 1
-train_x_mean = 0.5909#14884877
+train_x_mean = 0.5909#14884877    #the mean value of cross_subject_trainset
 max_len = 300
 
 feat_dim = 150
@@ -200,18 +197,10 @@ def res_atte(
                  padding="same",
                  kernel_initializer="he_normal",
                  kernel_regularizer=kernel_regularizer)(model)
-  #model = multiply([model,atten_map])
-  # model = BatchNormalization(axis=2)(model)
-  # model = Activation(activation)(model)
-  # model = Dropout(dropout)(model)
-  
+
   for depth in range(0,len(config)):
     res_s.append(model)
     for stride,filter_dim,num in config[depth]:
-      
-      #bn = BatchNormalization(axis=2)(model)
-      #ac = Activation(activation)(bn)
-      #dr = Dropout(dropout)(ac)
       model = BatchNormalization(axis=2)(model)
       model = Activation(activation)(model)
       model = Dropout(dropout)(model)
@@ -222,10 +211,6 @@ def res_atte(
                    padding="same",
                    kernel_initializer="he_normal",
                    kernel_regularizer=kernel_regularizer)(model)
-
-      # model = BatchNormalization(axis=2)(model)
-      # model = Activation(activation)(model)
-      # model = Dropout(dropout)(model)
       print model
       if depth in res_num:
         print len(res_s)
@@ -235,9 +220,7 @@ def res_atte(
         res = res_s[-3]
         res_shape = K.int_shape(res)
         model_shape = K.int_shape(model)
-        
-
-     
+             
         if res_shape[2] != model_shape[2]:
           res = Conv1D(num, 
                        1,
@@ -257,10 +240,6 @@ def res_atte(
         model = multiply([model_res,atten_map])
 
 
-  #bn = BatchNormalization(axis=2)(model)
-  #model = Activation(activation)(bn)
-
-
   pool_window_shape = K.int_shape(model)
   gap = AveragePooling1D(pool_window_shape[1],
                            strides=1)(model)
@@ -270,15 +249,6 @@ def res_atte(
                 kernel_initializer="he_normal")(flatten)
   model = Model(inputs=input, outputs=dense)
   return model
-
-
-
-
-
-
-
-
-
 
 
 def train():
